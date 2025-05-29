@@ -1,0 +1,36 @@
+{
+  "name": "mmry-twitter",
+  "private": true,
+  "version": "0.0.1",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "janniks",
+  "license": "MIT",
+  "mmry": {
+    "name": "Twitter Data Import",
+    "description": "Twitter plugin for importing Twitter data exports",
+    "store": {
+      "icon": "radix:TwitterLogoIcon",
+      "bg": "#1DA1F2",
+      "tagline": "Import your Twitter data exports"
+    },
+    "permissions": [
+      "create-item"
+    ],
+    "defaultCollection": {
+      "name": "Twitter",
+      "color": "#1DA1F2"
+    },
+    "type": "trigger",
+    "inputs": [
+      {
+        "id": "twitter-data-export",
+        "name": "Twitter Data Export",
+        "type": "file",
+        "description": "The Twitter data export file to import. Download the .zip file from https://twitter.com/settings/download_your_data"
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "mmry-pocket",
+  "version": "0.0.1",
+  "description": "A mmry plugin for Pocket",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "janniks",
+  "license": "MIT",
+  "mmry": {
+    "name": "Pocket Bookmarks Sync",
+    "description": "Pocket plugin for syncing bookmarks to mmry",
+    "store": {
+      "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXBvY2tldC1pY29uIGx1Y2lkZS1wb2NrZXQiPjxwYXRoIGQ9Ik00IDNoMTZhMiAyIDAgMCAxIDIgMnY2YTEwIDEwIDAgMCAxLTEwIDEwQTEwIDEwIDAgMCAxIDIgMTFWNWEyIDIgMCAwIDEgMi0yeiIvPjxwb2x5bGluZSBwb2ludHM9IjggMTAgMTIgMTQgMTYgMTAiLz48L3N2Zz4=",
+      "bg": "#D54D57",
+      "tagline": "Sync your Pocket bookmarks"
+    },
+    "permissions": [
+      "create-item"
+    ],
+    "type": "interval",
+    "env": [
+      {
+        "id": "POCKET_API_KEY",
+        "name": "Pocket API Key",
+        "type": "string",
+        "description": "The consumer key for the Pocket API. You can get it from https://getpocket.com/developer/apps/new"
+      }
+    ]
+  }
+}

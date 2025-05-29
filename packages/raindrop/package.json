@@ -1,0 +1,37 @@
+{
+  "name": "mmry-raindrop",
+  "private": true,
+  "version": "0.0.1",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "janniks",
+  "license": "MIT",
+  "mmry": {
+    "name": "Raindrop.io Import",
+    "description": "Import bookmarks from Raindrop.io",
+    "store": {
+      "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNsb3VkLWljb24gbHVjaWRlLWNsb3VkIj48cGF0aCBkPSJNMTcuNSAxOUg5YTcgNyAwIDEgMSA2LjcxLTloMS43OWE0LjUgNC41IDAgMSAxIDAgOVoiLz48L3N2Zz4=",
+      "bg": "#4086D9",
+      "tagline": "Import your Raindrop.io bookmarks"
+    },
+    "permissions": [
+      "create-item"
+    ],
+    "defaultCollection": {
+      "name": "Raindrop",
+      "color": "#4086D9"
+    },
+    "type": "interval",
+    "env": [
+      {
+        "id": "RAINDROP_API_TOKEN",
+        "name": "Raindrop API Token",
+        "type": "secret",
+        "description": "Your Raindrop.io API test token. Generate one at https://app.raindrop.io/settings/integrations"
+      }
+    ],
+    "inputs": []
+  }
+}

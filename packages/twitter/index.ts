@@ -5,8 +5,6 @@ console.log("Hello, world! Twitter plugin index.ts");
 console.log("mmry env");
 console.log(mmry.env());
 
-await mmry.db.read();
-
 console.log(mmry.inputs());
 console.log(mmry.input("twitter-data-export"));
 

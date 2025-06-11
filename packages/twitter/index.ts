@@ -24,6 +24,8 @@ const likes = JSON.parse(
 const items = likes.map((l: any) => ({
   externalId: l.like.tweetId,
   content: l.like.fullText,
+  username: l.like.username,
+  collection: "twitter:likes", // todo: make syntax work
 }));
 
 // mmry.addMany(items.slice(0, 10));

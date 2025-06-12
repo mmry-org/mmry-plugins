@@ -26,7 +26,18 @@ const items = likes.map((l: any) => ({
   content: l.like.fullText,
   username: l.like.username,
   collection: "twitter:likes", // todo: make syntax work
+  createdAt: getTweetDate(l.like.tweetId),
 }));
 
 // mmry.addMany(items.slice(0, 10));
 mmry.addMany(items);
+
+// HELPERS
+
+function getTweetDate(tweetId: string): Date {
+  const id = BigInt(tweetId);
+  const twitterEpoch = BigInt(1288834974657);
+  const timestampMs = id >> BigInt(22);
+  const createdTime = timestampMs + twitterEpoch;
+  return new Date(Number(createdTime));
+}

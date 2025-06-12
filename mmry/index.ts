@@ -10,17 +10,17 @@ const IN_DIR = "./in"; // todo
 
 export interface MmryItem {
   /** The id of the item in the external system/source */
-  externalId: string;
+  externalId?: string;
   /** The textual content of the item */
   content: string;
   /** The date the item was created */
-  createdAt: string;
+  createdAt?: number | string | Date;
   /** The date the item was updated */
-  updatedAt: string;
+  updatedAt?: number | string | Date;
   /** The urls associated with the item */
-  urls: string[];
+  urls?: string[];
   /** The images associated with the item */
-  images: string[];
+  images?: string[];
 }
 
 let stateInstance: LowSync<any> | null = null; // Singleton instance
@@ -91,7 +91,27 @@ export const mmry = {
       return undefined;
     }
   },
-  add(obj: object) {
+  add(obj: MmryItem) {
+    if (!obj) return;
+
+    // make sure obj.createdAt is in date format
+    if (obj?.createdAt && !(obj.createdAt instanceof Date)) {
+      obj.createdAt = new Date(
+        typeof obj.createdAt === "string"
+          ? Number(obj.createdAt)
+          : obj.createdAt
+      );
+    }
+
+    // make sure obj.updatedAt is in date format
+    if (obj?.updatedAt && !(obj.updatedAt instanceof Date)) {
+      obj.updatedAt = new Date(
+        typeof obj.updatedAt === "string"
+          ? Number(obj.updatedAt)
+          : obj.updatedAt
+      );
+    }
+
     const fileName = `${OUT_DIR}/${crypto.randomUUID()}.json`;
     Deno.writeTextFileSync(fileName, JSON.stringify(obj));
     console.log(`[MMRY] Added ${fileName}`);

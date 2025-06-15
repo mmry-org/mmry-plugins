@@ -5,11 +5,18 @@
     "npm:@mmry-org/sdk@*": "0.0.1",
     "npm:@mmry-org/sdk@0.0.2": "0.0.2",
     "npm:@the-convocation/twitter-scraper@*": "0.17.1",
+    "npm:@types/node@*": "22.14.1",
     "npm:lowdb@6.1.1": "6.1.1"
   },
   "jsr": {
     "@mmry-org/sdk@0.0.3": {
       "integrity": "c4f9db17b9be9dc8fc9cc6162f5dfe078dbaee991d5a5b4d72d30b820bc9279e",
+      "dependencies": [
+        "npm:lowdb"
+      ]
+    },
+    "@mmry-org/sdk@0.0.4": {
+      "integrity": "9cafce91241f949d53ea703109f8a6c922ed332a74ebdf1379f63036c6b8bbed",
       "dependencies": [
         "npm:lowdb"
       ]
@@ -40,6 +47,12 @@
         "set-cookie-parser",
         "tough-cookie",
         "tslib"
+      ]
+    },
+    "@types/node@22.14.1": {
+      "integrity": "sha512-u0HuPQwe/dHrItgHHpmw3N2fYCR6x4ivMNbPHRkBVP4CvN+kiRrKHWk3i8tXiO/joPwXLMYvF9TTF0eqgHIuOw==",
+      "dependencies": [
+        "undici-types"
       ]
     },
     "call-bind-apply-helpers@1.0.2": {
@@ -240,6 +253,9 @@
     },
     "tslib@2.8.1": {
       "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="
+    },
+    "undici-types@6.21.0": {
+      "integrity": "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="
     },
     "universalify@0.2.0": {
       "integrity": "sha512-CJ1QgKmNg3CwvAv/kOFmtnEN05f0D/cn9QntgNOQlQF9dgvVTHj3t+8JPdjqawCHk7V/KA+fbUqzZ9XWhcqPUg=="

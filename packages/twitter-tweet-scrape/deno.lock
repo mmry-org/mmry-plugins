@@ -1,9 +1,19 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@mmry-org/sdk@*": "0.0.3",
     "npm:@mmry-org/sdk@*": "0.0.1",
     "npm:@mmry-org/sdk@0.0.2": "0.0.2",
-    "npm:@the-convocation/twitter-scraper@*": "0.17.1"
+    "npm:@the-convocation/twitter-scraper@*": "0.17.1",
+    "npm:lowdb@6.1.1": "6.1.1"
+  },
+  "jsr": {
+    "@mmry-org/sdk@0.0.3": {
+      "integrity": "c4f9db17b9be9dc8fc9cc6162f5dfe078dbaee991d5a5b4d72d30b820bc9279e",
+      "dependencies": [
+        "npm:lowdb"
+      ]
+    }
   },
   "npm": {
     "@mmry-org/sdk@0.0.1": {
@@ -157,6 +167,12 @@
     "jsonify@0.0.1": {
       "integrity": "sha512-2/Ki0GcmuqSrgFyelQq9M05y7PS0mEwuIzrf3f1fPqkVDVRvZrPZtVSMHxdgo8Aq0sxAOb/cr2aqqA3LeWHVPg=="
     },
+    "lowdb@6.1.1": {
+      "integrity": "sha512-HO13FCxI8SCwfj2JRXOKgXggxnmfSc+l0aJsZ5I34X3pwzG/DPBSKyKu3Zkgg/pNmx854SVgE2la0oUeh6wzNw==",
+      "dependencies": [
+        "steno"
+      ]
+    },
     "math-intrinsics@1.1.0": {
       "integrity": "sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g=="
     },
@@ -206,6 +222,9 @@
         "gopd",
         "has-property-descriptors"
       ]
+    },
+    "steno@3.2.0": {
+      "integrity": "sha512-zPKkv+LqoYffxrtD0GIVA08DvF6v1dW02qpP5XnERoobq9g3MKcTSBTi08gbGNFMNRo3TQV/6kBw811T1LUhKg=="
     },
     "tough-cookie@4.1.4": {
       "integrity": "sha512-Loo5UUvLD9ScZ6jh8beX1T6sO1w2/MpCRpEP7V280GKMVUQ0Jzar2U3UJPsrdbziLEMMhu3Ujnq//rhiFuIeag==",

@@ -7,7 +7,7 @@ const RUN_DIR = Deno.env.get(RUN_DIR_ENV);
 const OUT_DIR = `${RUN_DIR}/out`;
 const IN_DIR = `${RUN_DIR}/in`;
 
-export interface MmryItem {
+export type MmryItem = {
   /** The id of the item in the external system/source */
   externalId?: string;
   /** The textual content of the item */
@@ -20,7 +20,7 @@ export interface MmryItem {
   urls?: string[];
   /** The images associated with the item */
   images?: string[];
-}
+} & { [key: string]: string | object | number | boolean | null };
 
 export interface MmryInput {
   id: string;

@@ -23,5 +23,6 @@ for (const item of mmry.items()) {
     mmry.update(item);
   } catch (e) {
     console.error(e);
+    Deno.exit(1);
   }
 }

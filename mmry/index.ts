@@ -1,5 +1,5 @@
-import { Low, LowSync } from "npm:lowdb@6.0.1";
-import { JSONFileSync } from "npm:lowdb@6.0.1/node";
+import { LowSync } from "npm:lowdb@6.1.1";
+import { JSONFileSync } from "npm:lowdb@6.1.1/node";
 
 const RUN_DIR_ENV = "MMRY_RUN_DIR";
 const RUN_DIR = Deno.env.get(RUN_DIR_ENV);
@@ -20,6 +20,11 @@ export interface MmryItem {
   urls?: string[];
   /** The images associated with the item */
   images?: string[];
+}
+
+export interface MmryInput {
+  id: string;
+  value: string;
 }
 
 let stateInstance: LowSync<any> | null = null; // Singleton instance
@@ -44,7 +49,7 @@ export const mmry = {
   state<T>(defaultData: T): LowSync<T> & T {
     if (!stateInstance) {
       const adapter = new JSONFileSync<T>(`${RUN_DIR}/data.json`);
-      stateInstance = new Low(adapter, defaultData);
+      stateInstance = new LowSync(adapter, defaultData);
       // Perform initial read when instance is created
       stateInstance.read();
     }
@@ -80,17 +85,19 @@ export const mmry = {
     return mmry.inputs().find((i) => i.id === id);
   },
   inputs() {
-    // todo returns array
-    return JSON.parse(mmry.env("MMRY_INPUTS"));
+    const env = mmry.env("MMRY_INPUTS");
+    if (!env) return [];
+    return JSON.parse(env as string) as MmryInput[];
   },
 
   inputFile(id: string) {
-    // todo: implement copy input files toggle in run UI (to ./files)
-    const path = mmry.input(id).value;
+    // ? todo: implement copy input files toggle in run UI (to ./files)
+    const input = mmry.input(id);
+    if (!input) return undefined;
 
     try {
-      const stat = Deno.statSync(path);
-      return { path: Deno.realPathSync(path), stat };
+      const stat = Deno.statSync(input.value);
+      return { path: Deno.realPathSync(input.value), stat };
     } catch (e) {
       console.error(e);
       return undefined;
@@ -131,7 +138,7 @@ export const mmry = {
     Deno.writeTextFileSync(fileName, JSON.stringify(obj));
     console.log(`[MMRY] Added ${fileName}`);
   },
-  addMany: (objs: object[]) => {
+  addMany: (objs: MmryItem[]) => {
     for (const obj of objs) {
       mmry.add(obj);
     }

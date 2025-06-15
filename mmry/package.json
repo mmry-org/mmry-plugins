@@ -1,11 +1,12 @@
 {
   "name": "@mmry-org/sdk",
   "version": "0.0.3",
+  "description": "",
+  "license": "MIT",
+  "author": "janniks",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "janniks",
-  "license": "MIT",
-  "description": ""
+    "build": "deno run -A npm:tsup index.ts --format esm --dts --out-dir dist",
+    "prepublishOnly": "npm run build"
+  }
 }

@@ -9,6 +9,7 @@ for (const item of mmry.items()) {
   try {
     console.log(`Processing item: ${item.id}`);
 
+    if (item?.collection !== "twitter:likes") continue; // wrong item type
     if (!item?.externalId) continue; // invalid
     if (item?.username) continue; // already scraped
 

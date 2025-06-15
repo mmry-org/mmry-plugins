@@ -5,10 +5,9 @@ const scraper = new Scraper();
 
 console.log("Starting twitter tweet scrape plugin...");
 
+let count = 0;
 for (const item of mmry.items()) {
   try {
-    console.log(`Processing item: ${item.id}`);
-
     if (item?.collection !== "twitter:likes") continue; // wrong item type
     if (!item?.externalId) continue; // invalid
     if (item?.username) continue; // already scraped
@@ -18,6 +17,9 @@ for (const item of mmry.items()) {
     delete tweet.__raw_UNSTABLE;
 
     mmry.update({ ...tweet, ...item });
+    count++;
+
+    mmry.status(`Processed ${count} tweets`);
   } catch (e) {
     console.error(e);
     Deno.exit(1);

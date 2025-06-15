@@ -1,4 +1,4 @@
-import { mmry } from "/Users/jannik/Documents/Dropbox/Files/Active/Repositories/mmry-plugins/mmry/index.ts";
+import { mmry } from "npm:@mmry-org/sdk";
 
 console.log("Hello, world! Twitter plugin index.ts");
 

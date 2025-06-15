@@ -5,8 +5,7 @@ const RUN_DIR_ENV = "MMRY_RUN_DIR";
 const RUN_DIR = Deno.env.get(RUN_DIR_ENV);
 
 const OUT_DIR = `${RUN_DIR}/out`;
-
-const IN_DIR = "./in"; // todo
+const IN_DIR = `${RUN_DIR}/in`;
 
 export interface MmryItem {
   /** The id of the item in the external system/source */
@@ -91,6 +90,16 @@ export const mmry = {
       return undefined;
     }
   },
+
+  *items() {
+    for (const entry of Deno.readDirSync(IN_DIR)) {
+      if (!entry.isFile || !entry.name.endsWith(".json")) continue;
+      const filePath = `${IN_DIR}/${entry.name}`;
+      const content = Deno.readTextFileSync(filePath);
+      yield JSON.parse(content);
+    }
+  },
+
   add(obj: MmryItem) {
     if (!obj) return;
 

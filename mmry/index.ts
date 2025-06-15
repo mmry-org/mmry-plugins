@@ -61,6 +61,12 @@ export const mmry = {
     console.log(`[MMRY] ${time} ${message ? message : ""}`);
     return time;
   },
+
+  /** Emit a status message, which is displayed in the plugin UI. Message should not contain newlines. */
+  status(message: string) {
+    console.log(`<mmry_status>${message}</mmry_status>`);
+  },
+
   env(id?: string) {
     if (id) return Deno.env.get(id);
 
@@ -96,7 +102,7 @@ export const mmry = {
       if (!entry.isFile || !entry.name.endsWith(".json")) continue;
       const filePath = `${IN_DIR}/${entry.name}`;
       const content = Deno.readTextFileSync(filePath);
-      yield JSON.parse(content);
+      yield JSON.parse(content) as MmryItem & { id: string };
     }
   },
 

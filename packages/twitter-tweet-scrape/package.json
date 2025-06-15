@@ -1,0 +1,26 @@
+{
+  "name": "mmry-twitter-tweet-scrape",
+  "private": true,
+  "version": "0.0.1",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "janniks",
+  "license": "MIT",
+  "mmry": {
+    "name": "Twitter Tweet Scrape",
+    "description": "Scrapes data for existing tweet items",
+    "store": {
+      "icon": "radix:TwitterLogoIcon",
+      "bg": "#1DA1F2",
+      "tagline": "Import your Twitter data exports"
+    },
+    "permissions": [
+      "create-item",
+      "update-item"
+    ],
+    "type": "enhance",
+    "filter": "twitter"
+  }
+}

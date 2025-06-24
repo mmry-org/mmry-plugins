@@ -1,0 +1,42 @@
+{
+  "name": "mmry-youtube-transcription",
+  "private": true,
+  "version": "0.0.1",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "janniks",
+  "license": "MIT",
+  "mmry": {
+    "name": "YouTube Transcription",
+    "description": "Transcribe YouTube videos",
+    "store": {
+      "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXlvdXR1YmUtaWNvbiBsdWNpZGUteW91dHViZSI+PHBhdGggZD0iTTIuNSAxN2EyNC4xMiAyNC4xMiAwIDAgMSAwLTEwIDIgMiAwIDAgMSAxLjQtMS40IDQ5LjU2IDQ5LjU2IDAgMCAxIDE2LjIgMEEyIDIgMCAwIDEgMjEuNSA3YTI0LjEyIDI0LjEyIDAgMCAxIDAgMTAgMiAyIDAgMCAxLTEuNCAxLjQgNDkuNTUgNDkuNTUgMCAwIDEtMTYuMiAwQTIgMiAwIDAgMSAyLjUgMTciLz48cGF0aCBkPSJtMTAgMTUgNS0zLTUtM3oiLz48L3N2Zz4=",
+      "bg": "#ff0000",
+      "tagline": "Transcribe YouTube videos"
+    },
+    "permissions": [
+      "create-item"
+    ],
+    "allow-net": [
+      "www.youtube-transcript.io",
+      "identitytoolkit.googleapis.com",
+      "youtube.com"
+    ],
+    "defaultCollection": {
+      "id": "youtube",
+      "name": "YouTube",
+      "color": "#ff0000"
+    },
+    "type": "trigger",
+    "inputs": [
+      {
+        "id": "youtube-video",
+        "name": "YouTube Video URL",
+        "type": "text",
+        "description": "The YouTube video URL to transcribe"
+      }
+    ]
+  }
+}

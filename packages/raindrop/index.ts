@@ -6,7 +6,7 @@ const RAINDROP_PER_PAGE = 50; // Max allowed by Raindrop API
 
 console.log("Raindrop plugin starting...");
 
-const token = mmry.env("RAINDROP_API_TOKEN");
+const token = mmry.input("RAINDROP_API_TOKEN")?.value;
 // if (!token) {
 //   console.error(
 //     "Raindrop API token (RAINDROP_API_TOKEN) is missing. Please configure it in the plugin settings."

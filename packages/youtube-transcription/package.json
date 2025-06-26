@@ -34,7 +34,7 @@
       {
         "id": "youtube-video",
         "name": "YouTube Video URL",
-        "type": "text",
+        "type": "string",
         "description": "The YouTube video URL to transcribe"
       }
     ]

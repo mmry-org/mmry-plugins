@@ -1,0 +1,41 @@
+{
+  "name": "mmry-github-stars",
+  "private": true,
+  "version": "0.0.1",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "janniks",
+  "license": "MIT",
+  "mmry": {
+    "name": "GitHub Stars",
+    "description": "Sync your GitHub starred repositories",
+    "store": {
+      "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXN0YXIiPjxwYXRoIGQ9Im0xMiAybDMuMDkgNi4yNkwyMiA5bC01IDQuODcgMS4xOCA2Ljg4TDEyIDE3bC02LjE4IDMuNzVMMSAxMy44N0wyIDlsNi45MS0uNzRMMTIgMloiLz48L3N2Zz4=",
+      "bg": "#f59e0b",
+      "tagline": "Import your GitHub starred repositories"
+    },
+    "permissions": [
+      "create-item"
+    ],
+    "allow-net": [
+      "api.github.com"
+    ],
+    "defaultCollection": {
+      "id": "github-stars",
+      "name": "GitHub Stars",
+      "color": "#f59e0b"
+    },
+    "defaultCron": "0 0 * * *",
+    "type": "interval",
+    "inputs": [
+      {
+        "id": "GITHUB_TOKEN",
+        "name": "GitHub Personal Access Token",
+        "type": "string",
+        "description": "Your GitHub Personal Access Token with 'Starring' read permissions. Generate one at https://github.com/settings/tokens"
+      }
+    ]
+  }
+}

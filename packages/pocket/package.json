@@ -20,7 +20,7 @@
       "create-item"
     ],
     "type": "interval",
-    "env": [
+    "inputs": [
       {
         "id": "POCKET_API_KEY",
         "name": "Pocket API Key",

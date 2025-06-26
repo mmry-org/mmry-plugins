@@ -23,15 +23,15 @@
       "name": "Raindrop",
       "color": "#4086D9"
     },
+    "defaultCron": "0 0 * * *",
     "type": "interval",
-    "env": [
+    "inputs": [
       {
         "id": "RAINDROP_API_TOKEN",
         "name": "Raindrop API Token",
-        "type": "secret",
+        "type": "string",
         "description": "Your Raindrop.io API test token. Generate one at https://app.raindrop.io/settings/integrations"
       }
-    ],
-    "inputs": []
+    ]
   }
 }

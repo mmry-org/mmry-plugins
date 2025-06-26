@@ -39,6 +39,11 @@ while (hasMorePages) {
   let foundNewStars = false;
 
   for (const repo of data) {
+    // Debug: Log repo structure for first few items
+    if (newStarsCount < 3) {
+      console.log(`Debug repo structure:`, JSON.stringify(repo, null, 2));
+    }
+    
     // Skip if we've already processed this star based on timestamp
     if (state.lastSyncTimestamp && repo.starred_at && 
         new Date(repo.starred_at) <= new Date(state.lastSyncTimestamp)) {
@@ -50,21 +55,23 @@ while (hasMorePages) {
 
     // Construct comprehensive content
     const topics = repo.topics || [];
+    const ownerLogin = repo.owner?.login || 'Unknown';
     const content = [
-      `Title: ${repo.name}`,
+      `Title: ${repo.name || 'Unknown'}`,
       `Description: ${repo.description || 'No description'}`,
       `Language: ${repo.language || 'Not specified'}`,
-      `Stars: ${repo.stargazers_count}`,
-      `Forks: ${repo.forks_count}`,
+      `Stars: ${repo.stargazers_count || 0}`,
+      `Forks: ${repo.forks_count || 0}`,
       topics.length > 0 ? `Topics: ${topics.join(', ')}` : '',
-      `Owner: ${repo.owner.login}`,
+      `Owner: ${ownerLogin}`,
     ].filter(Boolean).join('\n');
 
     // Build URLs array
-    const urls = [repo.html_url];
-    
-    // Add README URL if available (most repos have README in root)
+    const urls: string[] = [];
     if (repo.html_url) {
+      urls.push(repo.html_url);
+      
+      // Add README URL if available (most repos have README in root)
       urls.push(`${repo.html_url}/blob/${repo.default_branch || 'main'}/README.md`);
     }
 
@@ -82,12 +89,12 @@ while (hasMorePages) {
       collection: "github-stars",
       // Additional metadata
       language: repo.language,
-      starCount: repo.stargazers_count,
-      forkCount: repo.forks_count,
+      starCount: repo.stargazers_count || 0,
+      forkCount: repo.forks_count || 0,
       topics: topics,
-      owner: repo.owner.login,
-      repositoryName: repo.name,
-      fullName: repo.full_name,
+      owner: ownerLogin,
+      repositoryName: repo.name || 'Unknown',
+      fullName: repo.full_name || 'Unknown',
     });
 
     // Update state with latest star timestamp
@@ -152,6 +159,12 @@ async function fetchStarredRepos(page: number): Promise<GitHubStarredRepo[] | nu
 
     const data = await response.json() as GitHubStarredRepo[];
     console.log(`Fetched ${data.length} repositories from page ${page}`);
+    
+    // Log each repository for debugging
+    data.forEach((repo, index) => {
+      console.log(`Repo ${index + 1}:`, JSON.stringify(repo, null, 2));
+    });
+    
     return data;
     
   } catch (error) {
@@ -165,22 +178,22 @@ async function fetchStarredRepos(page: number): Promise<GitHubStarredRepo[] | nu
 
 interface GitHubStarredRepo {
   id: number;
-  name: string;
-  full_name: string;
-  description: string | null;
-  html_url: string;
-  homepage: string | null;
-  language: string | null;
-  stargazers_count: number;
-  forks_count: number;
-  topics: string[];
-  created_at: string;
-  updated_at: string;
+  name?: string;
+  full_name?: string;
+  description?: string | null;
+  html_url?: string;
+  homepage?: string | null;
+  language?: string | null;
+  stargazers_count?: number;
+  forks_count?: number;
+  topics?: string[];
+  created_at?: string;
+  updated_at?: string;
   starred_at?: string; // Available when using star+json accept header
-  default_branch: string;
-  owner: {
-    login: string;
-    avatar_url: string;
-    html_url: string;
+  default_branch?: string;
+  owner?: {
+    login?: string;
+    avatar_url?: string;
+    html_url?: string;
   };
 }

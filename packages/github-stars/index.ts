@@ -13,23 +13,25 @@ if (!token) {
 
 // Initialize state to track sync progress
 const state = mmry.state({
-  lastSyncedPage: 1,
   lastSyncTimestamp: null as string | null,
 });
 
-console.log(`Starting sync from page ${state.lastSyncedPage}`);
+console.log(
+  `Starting sync. Last sync timestamp: ${state.lastSyncTimestamp || "Never"}`
+);
 mmry.status("Fetching starred repositories...");
 
-let currentPage = state.lastSyncedPage;
+let currentPage = 1;
 let hasMorePages = true;
 let newStarsCount = 0;
+let newestStarTimestamp: string | null = null;
 
 while (hasMorePages) {
   console.log(`Fetching page ${currentPage}...`);
   mmry.status(`Fetching page ${currentPage} of starred repositories...`);
-  
+
   const data = await fetchStarredRepos(currentPage);
-  
+
   if (!data || data.length === 0) {
     console.log("No more starred repositories found");
     hasMorePages = false;
@@ -43,36 +45,55 @@ while (hasMorePages) {
     if (newStarsCount < 3) {
       console.log(`Debug repo structure:`, JSON.stringify(repo, null, 2));
     }
-    
-    // Skip if we've already processed this star based on timestamp
-    if (state.lastSyncTimestamp && repo.starred_at && 
-        new Date(repo.starred_at) <= new Date(state.lastSyncTimestamp)) {
-      continue;
+
+    // If we encounter a star older than our last sync, we've caught up
+    if (
+      state.lastSyncTimestamp &&
+      repo.starred_at &&
+      new Date(repo.starred_at) <= new Date(state.lastSyncTimestamp)
+    ) {
+      console.log(
+        `Found star from ${repo.starred_at}, older than last sync ${state.lastSyncTimestamp}. Caught up.`
+      );
+      hasMorePages = false;
+      break;
     }
 
     foundNewStars = true;
     newStarsCount++;
 
+    // Track the newest star timestamp for state updates
+    if (
+      !newestStarTimestamp ||
+      (repo.starred_at && repo.starred_at > newestStarTimestamp)
+    ) {
+      newestStarTimestamp = repo.starred_at || null;
+    }
+
     // Construct comprehensive content
     const topics = repo.topics || [];
-    const ownerLogin = repo.owner?.login || 'Unknown';
+    const ownerLogin = repo.owner?.login || "Unknown";
     const content = [
-      `Title: ${repo.name || 'Unknown'}`,
-      `Description: ${repo.description || 'No description'}`,
-      `Language: ${repo.language || 'Not specified'}`,
+      `Title: ${repo.name || "Unknown"}`,
+      `Description: ${repo.description || "No description"}`,
+      `Language: ${repo.language || "Not specified"}`,
       `Stars: ${repo.stargazers_count || 0}`,
       `Forks: ${repo.forks_count || 0}`,
-      topics.length > 0 ? `Topics: ${topics.join(', ')}` : '',
+      topics.length > 0 ? `Topics: ${topics.join(", ")}` : "",
       `Owner: ${ownerLogin}`,
-    ].filter(Boolean).join('\n');
+    ]
+      .filter(Boolean)
+      .join("\n");
 
     // Build URLs array
     const urls: string[] = [];
     if (repo.html_url) {
       urls.push(repo.html_url);
-      
+
       // Add README URL if available (most repos have README in root)
-      urls.push(`${repo.html_url}/blob/${repo.default_branch || 'main'}/README.md`);
+      urls.push(
+        `${repo.html_url}/blob/${repo.default_branch || "main"}/README.md`
+      );
     }
 
     // Add homepage URL if available
@@ -83,63 +104,55 @@ while (hasMorePages) {
     mmry.add({
       content,
       externalId: `github-star-${repo.id}`,
-      createdAt: repo.starred_at || repo.created_at,
-      updatedAt: repo.updated_at,
+      createdAt: repo.starred_at || repo.created_at || new Date().toISOString(),
+      updatedAt: repo.updated_at || new Date().toISOString(),
       urls,
       collection: "github-stars",
       // Additional metadata
-      language: repo.language,
+      language: repo.language || null,
       starCount: repo.stargazers_count || 0,
       forkCount: repo.forks_count || 0,
       topics: topics,
       owner: ownerLogin,
-      repositoryName: repo.name || 'Unknown',
-      fullName: repo.full_name || 'Unknown',
+      repositoryName: repo.name || "Unknown",
+      fullName: repo.full_name || "Unknown",
     });
-
-    // Update state with latest star timestamp
-    if (repo.starred_at) {
-      state.lastSyncTimestamp = repo.starred_at;
-    }
   }
 
-  // Update page tracking
-  state.lastSyncedPage = currentPage;
-  state.write();
-
-  // If we found new stars or got a full page, continue
+  // If we got fewer results than the page size, we've reached the end
   if (data.length < PER_PAGE) {
-    hasMorePages = false;
-  } else if (!foundNewStars && state.lastSyncTimestamp) {
-    // If we didn't find any new stars in this page and we have a timestamp,
-    // we've likely caught up with our previous sync
-    console.log("Caught up with previous sync - no new stars found");
+    console.log("Reached end of starred repositories (partial page)");
     hasMorePages = false;
   }
 
   currentPage++;
 }
 
-// Reset page counter for next sync if we reached the end
-if (!hasMorePages) {
-  state.lastSyncedPage = 1;
+// Update state with the newest star timestamp we processed
+if (newestStarTimestamp) {
+  state.lastSyncTimestamp = newestStarTimestamp;
   state.write();
+  console.log(`Updated last sync timestamp to: ${newestStarTimestamp}`);
 }
 
-console.log(`Sync complete. Processed ${newStarsCount} new starred repositories.`);
+console.log(
+  `Sync complete. Processed ${newStarsCount} new starred repositories.`
+);
 mmry.status(`Sync complete - ${newStarsCount} new stars imported`);
 
 // HELPERS
 
-async function fetchStarredRepos(page: number): Promise<GitHubStarredRepo[] | null> {
+async function fetchStarredRepos(
+  page: number
+): Promise<GitHubStarredRepo[] | null> {
   const url = `${GITHUB_API_URL}/user/starred?sort=created&direction=desc&per_page=${PER_PAGE}&page=${page}`;
-  
+
   try {
     const response = await fetch(url, {
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/vnd.github.star+json',
-        'X-GitHub-Api-Version': '2022-11-28',
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github.star+json",
+        "X-GitHub-Api-Version": "2022-11-28",
       },
     });
 
@@ -152,21 +165,22 @@ async function fetchStarredRepos(page: number): Promise<GitHubStarredRepo[] | nu
         console.error("GitHub API rate limit exceeded");
       } else {
         mmry.status(`GitHub API error: ${response.status}`);
-        console.error(`GitHub API error: ${response.status} ${response.statusText}`);
+        console.error(
+          `GitHub API error: ${response.status} ${response.statusText}`
+        );
       }
       return null;
     }
 
-    const data = await response.json() as GitHubStarredRepo[];
+    const data = (await response.json()) as GitHubStarredRepo[];
     console.log(`Fetched ${data.length} repositories from page ${page}`);
-    
+
     // Log each repository for debugging
     data.forEach((repo, index) => {
       console.log(`Repo ${index + 1}:`, JSON.stringify(repo, null, 2));
     });
-    
+
     return data;
-    
   } catch (error) {
     console.error(`Failed to fetch starred repos: ${error}`);
     mmry.status("Failed to fetch starred repositories");

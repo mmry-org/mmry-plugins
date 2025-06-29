@@ -40,45 +40,41 @@ while (hasMorePages) {
 
   let foundNewStars = false;
 
-  for (const repo of data) {
-    // Debug: Log repo structure for first few items
-    if (newStarsCount < 3) {
-      console.log(`Debug repo structure:`, JSON.stringify(repo, null, 2));
-    }
+  for (const star of data) {
+    const repo = star.repo;
 
     // If we encounter a star older than our last sync, we've caught up
     if (
       state.lastSyncTimestamp &&
-      repo.starred_at &&
-      new Date(repo.starred_at) <= new Date(state.lastSyncTimestamp)
+      star.starred_at &&
+      new Date(star.starred_at) <= new Date(state.lastSyncTimestamp)
     ) {
       console.log(
-        `Found star from ${repo.starred_at}, older than last sync ${state.lastSyncTimestamp}. Caught up.`
+        `Found star from ${star.starred_at}, older than last sync ${state.lastSyncTimestamp}. Caught up.`
       );
       hasMorePages = false;
       break;
     }
 
-    foundNewStars = true;
     newStarsCount++;
 
     // Track the newest star timestamp for state updates
     if (
       !newestStarTimestamp ||
-      (repo.starred_at && repo.starred_at > newestStarTimestamp)
+      (star.starred_at && star.starred_at > newestStarTimestamp)
     ) {
-      newestStarTimestamp = repo.starred_at || null;
+      newestStarTimestamp = star.starred_at;
     }
 
-    // Construct comprehensive content
-    const topics = repo.topics || [];
-    const ownerLogin = repo.owner?.login || "Unknown";
+    // Access repository data from the nested repo property
+    const topics = repo?.topics || [];
+    const ownerLogin = repo?.owner?.login || "Unknown";
     const content = [
-      `Title: ${repo.name || "Unknown"}`,
-      `Description: ${repo.description || "No description"}`,
-      `Language: ${repo.language || "Not specified"}`,
-      `Stars: ${repo.stargazers_count || 0}`,
-      `Forks: ${repo.forks_count || 0}`,
+      `Title: ${repo?.name || "Unknown"}`,
+      `Description: ${repo?.description || "No description"}`,
+      `Language: ${repo?.language || "Not specified"}`,
+      `Stars: ${repo?.stargazers_count || 0}`,
+      `Forks: ${repo?.forks_count || 0}`,
       topics.length > 0 ? `Topics: ${topics.join(", ")}` : "",
       `Owner: ${ownerLogin}`,
     ]
@@ -87,7 +83,7 @@ while (hasMorePages) {
 
     // Build URLs array
     const urls: string[] = [];
-    if (repo.html_url) {
+    if (repo?.html_url) {
       urls.push(repo.html_url);
 
       // Add README URL if available (most repos have README in root)
@@ -97,25 +93,25 @@ while (hasMorePages) {
     }
 
     // Add homepage URL if available
-    if (repo.homepage) {
+    if (repo?.homepage) {
       urls.push(repo.homepage);
     }
 
     mmry.add({
       content,
-      externalId: `github-star-${repo.id}`,
-      createdAt: repo.starred_at || repo.created_at || new Date().toISOString(),
-      updatedAt: repo.updated_at || new Date().toISOString(),
+      externalId: `github-star-${repo?.id}`,
+      createdAt: star.starred_at || new Date().toISOString(),
+      updatedAt: repo?.updated_at || new Date().toISOString(),
       urls,
       collection: "github-stars",
       // Additional metadata
-      language: repo.language || null,
-      starCount: repo.stargazers_count || 0,
-      forkCount: repo.forks_count || 0,
+      language: repo?.language || null,
+      starCount: repo?.stargazers_count || 0,
+      forkCount: repo?.forks_count || 0,
       topics: topics,
       owner: ownerLogin,
-      repositoryName: repo.name || "Unknown",
-      fullName: repo.full_name || "Unknown",
+      repositoryName: repo?.name || "Unknown",
+      fullName: repo?.full_name || "Unknown",
     });
   }
 
@@ -125,14 +121,14 @@ while (hasMorePages) {
     hasMorePages = false;
   }
 
-  currentPage++;
-}
+  // Persist state after each page
+  if (newestStarTimestamp) {
+    state.lastSyncTimestamp = newestStarTimestamp;
+    state.write();
+    console.log(`Updated last sync timestamp to: ${newestStarTimestamp}`);
+  }
 
-// Update state with the newest star timestamp we processed
-if (newestStarTimestamp) {
-  state.lastSyncTimestamp = newestStarTimestamp;
-  state.write();
-  console.log(`Updated last sync timestamp to: ${newestStarTimestamp}`);
+  currentPage++;
 }
 
 console.log(
@@ -144,7 +140,7 @@ mmry.status(`Sync complete - ${newStarsCount} new stars imported`);
 
 async function fetchStarredRepos(
   page: number
-): Promise<GitHubStarredRepo[] | null> {
+): Promise<GitHubStarredData[] | null> {
   const url = `${GITHUB_API_URL}/user/starred?sort=created&direction=desc&per_page=${PER_PAGE}&page=${page}`;
 
   try {
@@ -172,13 +168,8 @@ async function fetchStarredRepos(
       return null;
     }
 
-    const data = (await response.json()) as GitHubStarredRepo[];
+    const data = (await response.json()) as GitHubStarredData[];
     console.log(`Fetched ${data.length} repositories from page ${page}`);
-
-    // Log each repository for debugging
-    data.forEach((repo, index) => {
-      console.log(`Repo ${index + 1}:`, JSON.stringify(repo, null, 2));
-    });
 
     return data;
   } catch (error) {
@@ -190,7 +181,12 @@ async function fetchStarredRepos(
 
 // TYPES
 
-interface GitHubStarredRepo {
+interface GitHubStarredData {
+  starred_at: string;
+  repo: GitHubRepo;
+}
+
+interface GitHubRepo {
   id: number;
   name?: string;
   full_name?: string;
@@ -203,7 +199,6 @@ interface GitHubStarredRepo {
   topics?: string[];
   created_at?: string;
   updated_at?: string;
-  starred_at?: string; // Available when using star+json accept header
   default_branch?: string;
   owner?: {
     login?: string;

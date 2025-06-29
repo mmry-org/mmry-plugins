@@ -23,7 +23,7 @@
       "api.github.com"
     ],
     "defaultCollection": {
-      "id": "github:star",
+      "id": "github:repository:star",
       "name": "GitHub Stars",
       "color": "#f59e0b"
     },

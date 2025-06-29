@@ -13,18 +13,19 @@ if (!token) {
 
 // Initialize state to track sync progress
 const state = mmry.state({
-  lastSyncTimestamp: null as string | null,
+  lastSeenStarTimestamp: null as string | null,
 });
 
 console.log(
-  `Starting sync. Last sync timestamp: ${state.lastSyncTimestamp || "Never"}`
+  `Starting sync. Last seen star timestamp: ${
+    state.lastSeenStarTimestamp || "Never"
+  }`
 );
 mmry.status("Fetching starred repositories...");
 
 let currentPage = 1;
 let hasMorePages = true;
 let newStarsCount = 0;
-let newestStarTimestamp: string | null = null;
 let processedForDebugCount = 0;
 const DEBUG_ITEM_LIMIT = 10;
 
@@ -40,19 +41,17 @@ while (hasMorePages) {
     break;
   }
 
-  let foundNewStars = false;
-
   for (const star of data) {
     const repo = star.repo;
 
-    // If we encounter a star older than our last sync, we've caught up
+    // If we encounter a star we've already seen, we've caught up
     if (
-      state.lastSyncTimestamp &&
+      state.lastSeenStarTimestamp &&
       star.starred_at &&
-      new Date(star.starred_at) <= new Date(state.lastSyncTimestamp)
+      star.starred_at <= state.lastSeenStarTimestamp
     ) {
       console.log(
-        `Found star from ${star.starred_at}, older than last sync ${state.lastSyncTimestamp}. Caught up.`
+        `Found star from ${star.starred_at}, which we've already seen (last seen: ${state.lastSeenStarTimestamp}). Caught up.`
       );
       hasMorePages = false;
       break;
@@ -64,12 +63,10 @@ while (hasMorePages) {
       `Processing new star #${processedForDebugCount} (${repo.full_name})`
     );
 
-    // Track the newest star timestamp for state updates
-    if (
-      !newestStarTimestamp ||
-      (star.starred_at && star.starred_at > newestStarTimestamp)
-    ) {
-      newestStarTimestamp = star.starred_at;
+    // Update state after each star to enable resuming
+    if (star.starred_at) {
+      state.lastSeenStarTimestamp = star.starred_at;
+      state.write();
     }
 
     // Access repository data from the nested repo property
@@ -105,11 +102,10 @@ while (hasMorePages) {
 
     const itemToAdd = {
       content,
-      externalId: `github-star-${repo?.id}`,
+      externalId: repo?.id.toString(),
       createdAt: star.starred_at || new Date().toISOString(),
       updatedAt: repo?.updated_at || new Date().toISOString(),
       urls,
-      collection: "github-stars",
       // Additional metadata
       language: repo?.language || null,
       starCount: repo?.stargazers_count || 0,
@@ -139,27 +135,18 @@ while (hasMorePages) {
     hasMorePages = false;
   }
 
-  // Persist state after each page
-  if (newestStarTimestamp) {
-    state.lastSyncTimestamp = newestStarTimestamp;
-    state.write();
-    console.log(`Updated last sync timestamp to: ${newestStarTimestamp}`);
-  }
-
   currentPage++;
 }
 
-console.log(
-  `Sync complete. Processed ${newStarsCount} new starred repositories.`
-);
-mmry.status(`Sync complete - ${newStarsCount} new stars imported`);
+console.log(`Done. Processed ${newStarsCount} new starred repositories.`);
+mmry.status(`${newStarsCount} new stars imported`);
 
 // HELPERS
 
 async function fetchStarredRepos(
   page: number
 ): Promise<GitHubStarredData[] | null> {
-  const url = `${GITHUB_API_URL}/user/starred?sort=created&direction=desc&per_page=${PER_PAGE}&page=${page}`;
+  const url = `${GITHUB_API_URL}/user/starred?sort=created&direction=asc&per_page=${PER_PAGE}&page=${page}`;
 
   try {
     const response = await fetch(url, {

@@ -25,6 +25,8 @@ let currentPage = 1;
 let hasMorePages = true;
 let newStarsCount = 0;
 let newestStarTimestamp: string | null = null;
+let processedForDebugCount = 0;
+const DEBUG_ITEM_LIMIT = 10;
 
 while (hasMorePages) {
   console.log(`Fetching page ${currentPage}...`);
@@ -57,6 +59,10 @@ while (hasMorePages) {
     }
 
     newStarsCount++;
+    processedForDebugCount++;
+    console.log(
+      `Processing new star #${processedForDebugCount} (${repo.full_name})`
+    );
 
     // Track the newest star timestamp for state updates
     if (
@@ -97,7 +103,7 @@ while (hasMorePages) {
       urls.push(repo.homepage);
     }
 
-    mmry.add({
+    const itemToAdd = {
       content,
       externalId: `github-star-${repo?.id}`,
       createdAt: star.starred_at || new Date().toISOString(),
@@ -112,7 +118,19 @@ while (hasMorePages) {
       owner: ownerLogin,
       repositoryName: repo?.name || "Unknown",
       fullName: repo?.full_name || "Unknown",
-    });
+    };
+
+    console.log("Adding item to mmry:", JSON.stringify(itemToAdd, null, 2));
+    mmry.add(itemToAdd);
+
+    // Hard stop for debugging
+    if (processedForDebugCount >= DEBUG_ITEM_LIMIT) {
+      console.log(
+        `\n--- DEBUG: Hit item limit of ${DEBUG_ITEM_LIMIT}. Stopping sync. ---\n`
+      );
+      hasMorePages = false;
+      break;
+    }
   }
 
   // If we got fewer results than the page size, we've reached the end

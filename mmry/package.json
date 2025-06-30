@@ -1,12 +1,20 @@
 {
   "name": "@mmry-org/sdk",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "license": "MIT",
   "author": "janniks",
   "main": "index.ts",
   "scripts": {
-    "build": "deno run -A npm:tsup index.ts --format esm --dts --out-dir dist",
+    "build": "tsup index.ts --format esm --dts --out-dir dist",
     "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "lowdb": "^6.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.7",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
   }
 }

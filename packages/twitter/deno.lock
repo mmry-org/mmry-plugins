@@ -2,12 +2,19 @@
   "version": "5",
   "specifiers": {
     "npm:@mmry-org/sdk@*": "0.0.1",
+    "npm:@mmry-org/sdk@0.0.5": "0.0.5",
     "npm:@the-convocation/twitter-scraper@*": "0.17.1",
     "npm:lowdb@6.0.1": "6.0.1"
   },
   "npm": {
     "@mmry-org/sdk@0.0.1": {
       "integrity": "sha512-5tQV4XGSXZWJduXwHTy0dK1SHDy8WflJ2wKcOKUBpOgPHjw3+Fpc/khw3YRmJl/7Vd6GSAPhwzrOkV92ecWVFQ=="
+    },
+    "@mmry-org/sdk@0.0.5": {
+      "integrity": "sha512-S5aWiLZiGS+mt53nYuY1ZNvkaTU4q4H7esNLpCtt3LPr5q6d3cSfJBG5CExzd4DKjLzMgzdHSxiOpMdNukXGrg==",
+      "dependencies": [
+        "lowdb@6.1.1"
+      ]
     },
     "@noble/hashes@1.7.1": {
       "integrity": "sha512-B8XBPsn4vT/KJAGqDzbwztd+6Yte3P4V7iafm24bxgDe/mlRuK6xmWPuCNrKt2vDafZ8MfJLlchDG/vYafQEjQ=="
@@ -156,6 +163,12 @@
     },
     "lowdb@6.0.1": {
       "integrity": "sha512-1ktuKYLlQzAWwl4/PQkIr8JzNXgcTM6rAhpXaQ6BR+VwI98Q8ZwMFhBOn9u0ldcW3K/WWzhYpS3xyGTshgVGzA==",
+      "dependencies": [
+        "steno"
+      ]
+    },
+    "lowdb@6.1.1": {
+      "integrity": "sha512-HO13FCxI8SCwfj2JRXOKgXggxnmfSc+l0aJsZ5I34X3pwzG/DPBSKyKu3Zkgg/pNmx854SVgE2la0oUeh6wzNw==",
       "dependencies": [
         "steno"
       ]

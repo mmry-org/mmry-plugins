@@ -1,11 +1,19 @@
 {
   "version": "5",
   "specifiers": {
+    "npm:@mmry-org/sdk@*": "0.0.5",
     "npm:@types/node@*": "22.14.1",
     "npm:cheerio@*": "1.1.0",
+    "npm:lowdb@6.1.1": "6.1.1",
     "npm:mmry@*": "1.0.2"
   },
   "npm": {
+    "@mmry-org/sdk@0.0.5": {
+      "integrity": "sha512-S5aWiLZiGS+mt53nYuY1ZNvkaTU4q4H7esNLpCtt3LPr5q6d3cSfJBG5CExzd4DKjLzMgzdHSxiOpMdNukXGrg==",
+      "dependencies": [
+        "lowdb"
+      ]
+    },
     "@types/node@22.14.1": {
       "integrity": "sha512-u0HuPQwe/dHrItgHHpmw3N2fYCR6x4ivMNbPHRkBVP4CvN+kiRrKHWk3i8tXiO/joPwXLMYvF9TTF0eqgHIuOw==",
       "dependencies": [
@@ -108,6 +116,12 @@
         "safer-buffer"
       ]
     },
+    "lowdb@6.1.1": {
+      "integrity": "sha512-HO13FCxI8SCwfj2JRXOKgXggxnmfSc+l0aJsZ5I34X3pwzG/DPBSKyKu3Zkgg/pNmx854SVgE2la0oUeh6wzNw==",
+      "dependencies": [
+        "steno"
+      ]
+    },
     "mmry@1.0.2": {
       "integrity": "sha512-aPAQ2fg+8slPUFLyfblOR3zAqBmPYGQgZ75CIUJ3Wyn7MJQNLgDB91cOdKZe5qWJo7/tqA1E2NYXBS4Vyua6Mw=="
     },
@@ -138,6 +152,9 @@
     },
     "safer-buffer@2.1.2": {
       "integrity": "sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg=="
+    },
+    "steno@3.2.0": {
+      "integrity": "sha512-zPKkv+LqoYffxrtD0GIVA08DvF6v1dW02qpP5XnERoobq9g3MKcTSBTi08gbGNFMNRo3TQV/6kBw811T1LUhKg=="
     },
     "undici-types@6.21.0": {
       "integrity": "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="

@@ -13,12 +13,13 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
 
-    "module": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "outDir": "dist",
     "sourceMap": true,
 
     "declaration": true,
 
-    "lib": ["es2022", "deno.ns", "deno.window"]
+    "lib": ["es2022"]
   }
 }

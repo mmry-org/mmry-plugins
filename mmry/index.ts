@@ -1,8 +1,11 @@
-import { LowSync } from "npm:lowdb@6.1.1";
-import { JSONFileSync } from "npm:lowdb@6.1.1/node";
+import { LowSync } from "lowdb";
+import { JSONFileSync } from "lowdb/node";
+import * as fs from "fs";
+import * as path from "path";
+import { randomUUID } from "crypto";
 
 const RUN_DIR_ENV = "MMRY_RUN_DIR";
-const RUN_DIR = Deno.env.get(RUN_DIR_ENV);
+const RUN_DIR = process.env[RUN_DIR_ENV];
 
 const OUT_DIR = `${RUN_DIR}/out`;
 const IN_DIR = `${RUN_DIR}/in`;
@@ -31,8 +34,9 @@ let stateInstance: LowSync<any> | null = null; // Singleton instance
 const stateProxyHandler: ProxyHandler<LowSync<any>> = {
   get(target, prop, receiver) {
     if (prop === "read" || prop === "write") {
-      // Directly call read/write on the Low instance
-      return Reflect.get(target, prop, receiver);
+      // Directly call read/write on the Low instance with proper binding
+      const value = Reflect.get(target, prop, receiver);
+      return typeof value === "function" ? value.bind(target) : value;
     }
     // Access properties on the .data object
     return Reflect.get(target.data, prop, receiver);
@@ -44,14 +48,23 @@ const stateProxyHandler: ProxyHandler<LowSync<any>> = {
   },
 };
 
+export type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
+
 export const mmry = {
   // Initialize the state instance on first call and return a proxy
-  state<T>(defaultData: T): LowSync<T> & T {
+  state<T>(defaultData: T): Prettify<Pick<LowSync<T>, "write"> & T> {
     if (!stateInstance) {
       const adapter = new JSONFileSync<T>(`${RUN_DIR}/data.json`);
       stateInstance = new LowSync(adapter, defaultData);
       // Perform initial read when instance is created
       stateInstance.read();
+      // If data is null (file doesn't exist), initialize with default data
+      if (stateInstance.data === null) {
+        stateInstance.data = defaultData;
+        stateInstance.write();
+      }
     }
     // Return the proxy wrapping the singleton instance
     // Cast to LowSync<T> & T to allow direct property access via proxy
@@ -73,10 +86,10 @@ export const mmry = {
   },
 
   env(id?: string) {
-    if (id) return Deno.env.get(id);
+    if (id) return process.env[id];
 
     return Object.fromEntries(
-      Object.entries(Deno.env.toObject()).filter(
+      Object.entries(process.env).filter(
         ([key]) => !key.startsWith("_")
       )
     );
@@ -96,8 +109,8 @@ export const mmry = {
     if (!input) return undefined;
 
     try {
-      const stat = Deno.statSync(input.value);
-      return { path: Deno.realPathSync(input.value), stat };
+      const stat = fs.statSync(input.value);
+      return { path: fs.realpathSync(input.value), stat };
     } catch (e) {
       console.error(e);
       return undefined;
@@ -105,10 +118,11 @@ export const mmry = {
   },
 
   *items() {
-    for (const entry of Deno.readDirSync(IN_DIR)) {
-      if (!entry.isFile || !entry.name.endsWith(".json")) continue;
-      const filePath = `${IN_DIR}/${entry.name}`;
-      const content = Deno.readTextFileSync(filePath);
+    const entries = fs.readdirSync(IN_DIR, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isFile() || !entry.name.endsWith(".json")) continue;
+      const filePath = path.join(IN_DIR, entry.name);
+      const content = fs.readFileSync(filePath, 'utf8');
       yield JSON.parse(content) as MmryItem & { id: string };
     }
   },
@@ -134,8 +148,8 @@ export const mmry = {
       );
     }
 
-    const fileName = `${OUT_DIR}/${crypto.randomUUID()}.json`;
-    Deno.writeTextFileSync(fileName, JSON.stringify(obj));
+    const fileName = path.join(OUT_DIR, `${randomUUID()}.json`);
+    fs.writeFileSync(fileName, JSON.stringify(obj));
     console.log(`[MMRY] Added ${fileName}`);
   },
   addMany: (objs: MmryItem[]) => {
@@ -145,8 +159,8 @@ export const mmry = {
   },
   update(obj: MmryItem & { id: string }) {
     // No need to check for obj.id anymore, TypeScript ensures it
-    const fileName = `${OUT_DIR}/${obj.id}.json`;
-    Deno.writeTextFileSync(fileName, JSON.stringify(obj));
+    const fileName = path.join(OUT_DIR, `${obj.id}.json`);
+    fs.writeFileSync(fileName, JSON.stringify(obj));
     console.log(`[MMRY] Updated ${fileName}`);
   },
   updateMany: (objs: (MmryItem & { id: string })[]) => {
@@ -155,19 +169,3 @@ export const mmry = {
     }
   },
 };
-
-// PLUGIN //////////////////////////////////////////////////////////////////////
-console.log("mmry.env()");
-console.log(mmry.env());
-
-// // Initialize the statebase with default data if needed
-// const state = mmry.state({ posts: [] });
-
-// // Now access data properties directly via the proxy
-// state.posts.push(`hello world ${mmry.time()}`);
-// const _firstPost = state.posts[0];
-
-// // Write changes using the proxy's write method
-// state.write();
-
-// console.log("state", state.data); // Access underlying data if needed (though proxy allows direct access)

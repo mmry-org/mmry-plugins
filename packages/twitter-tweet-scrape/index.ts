@@ -1,4 +1,4 @@
-import { mmry } from "jsr:@mmry-org/sdk@0.0.4";
+import { mmry } from "npm:@mmry-org/sdk";
 import { Scraper } from "npm:@the-convocation/twitter-scraper";
 
 const scraper = new Scraper();

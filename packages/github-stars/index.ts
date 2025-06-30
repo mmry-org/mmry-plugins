@@ -1,4 +1,4 @@
-import { mmry } from "jsr:@mmry-org/sdk@0.0.4";
+import { mmry } from "npm:@mmry-org/sdk@0.0.5";
 
 const GITHUB_API_URL = "https://api.github.com";
 const PER_PAGE = 100; // Maximum allowed by GitHub API
@@ -21,7 +21,7 @@ console.log(
     state.lastSeenStarTimestamp || "Never"
   }`
 );
-mmry.status("Fetching starred repositories...");
+mmry.status("Fetching repositories...");
 
 let currentPage = 1;
 let hasMorePages = true;
@@ -31,7 +31,6 @@ const DEBUG_ITEM_LIMIT = 10;
 
 while (hasMorePages) {
   console.log(`Fetching page ${currentPage}...`);
-  mmry.status(`Fetching page ${currentPage} of starred repositories...`);
 
   const data = await fetchStarredRepos(currentPage);
 
@@ -57,17 +56,9 @@ while (hasMorePages) {
       break;
     }
 
-    newStarsCount++;
-    processedForDebugCount++;
     console.log(
       `Processing new star #${processedForDebugCount} (${repo.full_name})`
     );
-
-    // Update state after each star to enable resuming
-    if (star.starred_at) {
-      state.lastSeenStarTimestamp = star.starred_at;
-      state.write();
-    }
 
     // Access repository data from the nested repo property
     const topics = repo?.topics || [];
@@ -119,6 +110,16 @@ while (hasMorePages) {
     console.log("Adding item to mmry:", JSON.stringify(itemToAdd, null, 2));
     mmry.add(itemToAdd);
 
+    // Update state after each star to enable resuming
+    if (star.starred_at) {
+      state.lastSeenStarTimestamp = star.starred_at;
+      console.log("Updating state.starred_at to", star.starred_at);
+      state.write();
+    }
+
+    newStarsCount++;
+    processedForDebugCount++;
+
     // Hard stop for debugging
     if (processedForDebugCount >= DEBUG_ITEM_LIMIT) {
       console.log(
@@ -139,7 +140,7 @@ while (hasMorePages) {
 }
 
 console.log(`Done. Processed ${newStarsCount} new starred repositories.`);
-mmry.status(`${newStarsCount} new stars imported`);
+mmry.status(`${newStarsCount} stars imported`);
 
 // HELPERS
 

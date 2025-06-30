@@ -1,5 +1,5 @@
 import * as cheerio from "npm:cheerio";
-import { mmry } from "jsr:@mmry-org/sdk@0.0.4";
+import { mmry } from "npm:@mmry-org/sdk";
 
 /// HELPERS
 // THE TranscriptClient IS TAKEN FROM https://github.com/0x6a69616e/youtube-transcript-api/

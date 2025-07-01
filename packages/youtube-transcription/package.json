@@ -20,9 +20,9 @@
       "create-item"
     ],
     "allow-net": [
-      "www.youtube-transcript.io",
-      "identitytoolkit.googleapis.com",
-      "youtube.com"
+      "youtube.com",
+      "www.youtube.com",
+      "youtubei.googleapis.com"
     ],
     "defaultCollection": {
       "id": "youtube",

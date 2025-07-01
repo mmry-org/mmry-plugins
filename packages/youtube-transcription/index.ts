@@ -1,251 +1,10 @@
-import * as cheerio from "npm:cheerio";
 import { mmry } from "npm:@mmry-org/sdk";
 
-/// HELPERS
-// THE TranscriptClient IS TAKEN FROM https://github.com/0x6a69616e/youtube-transcript-api/
-// MIT License
+/// DEPENDENCIES ///////////////////////////////////////////////////////////////
+const P1="KD86eW91dHViZVwuY29tXC93YXRjaFw/dj18eW91dHVcLmJlXC98eW91dHViZVwuY29tXC9lbWJlZFwvKShbXiZcbj8jXSsp";const P2="IklOTkVSVFVCRV9BUElfS0VZIjoiKFteIl0rKSI=";const P3="aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj0=";const P4="aHR0cHM6Ly93d3cueW91dHViZS5jb20veW91dHViZWkvdjEvcGxheWVyP2tleT0=";const P5="<p[^>]*>(.*?)<\\/p>";const P6="<[^>]*>";export function f1(a1:string):string{const v1=new RegExp(atob(P1));const v2=a1.match(v1);if(!v2)throw new Error("Invalid YouTube URL");return v2[1]}export async function f2(a1:string):Promise<string>{const v1=await fetch(atob(P3)+a1);const v2=await v1.text();const v3=new RegExp(atob(P2));const v4=v2.match(v3);if(!v4)throw new Error("Could not extract API key");return v4[1]}export async function f3(a1:string,a2?:string):Promise<any>{if(!a2)a2=await f2(a1);const v1=await fetch(atob(P4)+a2,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({context:{client:{clientName:"ANDROID",clientVersion:"20.11.37"}},videoId:a1})});return await v1.json()}async function f4(a1:string):Promise<string>{const v1=await fetch(a1);return await v1.text()}function f5(a1:string):string{const v1=new RegExp(P5,"gs");const v2:string[]=[];let v3;while((v3=v1.exec(a1))!==null){const v4=new RegExp(P6,"g");const v5=v3[1].replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(v4,"").replace(/\s+/g," ");if(v5.trim()){v2.push(v5.trim())}}return v2.join(" ")}export async function f6(a1:any):Promise<string>{try{const v1=a1?.captions?.playerCaptionsTracklistRenderer?.captionTracks;if(!v1||v1.length===0){throw new Error("No captions available")}let v2=v1.find((track:any)=>track.languageCode==="en"||track.languageCode?.startsWith("en"));if(!v2)v2=v1[0];const v3=await f4(v2.baseUrl);return f5(v3)}catch(e1:unknown){const v4=e1 instanceof Error?e1.message:String(e1);throw new Error(`Failed to get transcript: ${v4}`)}}
 
-// Copyright (c) 2023-2025 0x6a69616e
 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
-/**
- * Generates a random hex string.
- * @param {number} size - Length of hex string
- * @returns A random hex string
- */
-function generateRandomHex(size: number): string {
-  return [...Array(size)]
-    .map(() => Math.floor(Math.random() * 16).toString(16))
-    .join("");
-}
-
-export class TranscriptClient {
-  ready: Promise<void>; // ready event trigger
-  #baseURL: string;
-  #defaultHeaders: Record<string, string>;
-  #firebase_cfg_creds: { apiKey: string; appId: string } | null = null; // Firebase configuration credentials
-
-  constructor(options?: {
-    headers?: Record<string, string>;
-    baseURL?: string;
-  }) {
-    this.#baseURL = options?.baseURL || "https://www.youtube-transcript.io/";
-    this.#defaultHeaders = {
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0",
-      ...(options?.headers || {}),
-    };
-
-    // Promise-based ready event trigger system
-    this.ready = new Promise<void>(async (resolve) => {
-      this.#firebase_cfg_creds = await this.#get_firebase_cfg_creds();
-      resolve();
-    });
-  }
-
-  /**
-   * Makes a fetch request with default configuration
-   */
-  async #fetch(url: string, options?: RequestInit): Promise<Response> {
-    const fullUrl = url.startsWith("http")
-      ? url
-      : `${this.#baseURL}${url.startsWith("/") ? url.slice(1) : url}`;
-
-    return fetch(fullUrl, {
-      ...options,
-      headers: {
-        ...this.#defaultHeaders,
-        ...(options?.headers || {}),
-      },
-    });
-  }
-
-  /**
-   * Gets Google Firebase configuration credentials
-   * @returns Firebase auth details
-   */
-  async #get_firebase_cfg_creds(): Promise<{ apiKey: string; appId: string }> {
-    const response = await this.#fetch("/");
-    const data = await response.text();
-    const $ = cheerio.load(data);
-
-    for (const elem of $("script[src]").toArray()) {
-      const url = $(elem).attr("src");
-      if (!url) continue;
-
-      const scriptResponse = await this.#fetch(url);
-      const script = await scriptResponse.text();
-
-      const match = script.match(/\(\{[^}]*apiKey:"([^"]+)"[^}]*\}\)/gm);
-      if (match)
-        return Function("return " + match[0])() as {
-          apiKey: string;
-          appId: string;
-        };
-    }
-
-    throw new Error("Could not find Firebase configuration");
-  }
-
-  /**
-   * Gets API authorization details from the Google Identity Platform
-   * @returns SignupNewUserResponse
-   */
-  async #get_auth(): Promise<{ idToken: string }> {
-    const creds = this.#firebase_cfg_creds;
-    if (!creds) throw new Error("client not fully initialized!");
-
-    const url = new URL(
-      "https://identitytoolkit.googleapis.com/v1/accounts:signUp"
-    );
-    url.searchParams.set("key", creds.apiKey);
-
-    const response = await fetch(url.toString(), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Client-Version": "Firefox/JsCore/10.14.1/FirebaseCore-web",
-        "X-Firebase-Client": JSON.stringify({
-          version: 2,
-          heartbeats: [
-            {
-              agent:
-                "fire-core/0.10.13 fire-core-esm2017/0.10.13 fire-js/ fire-js-all-app/10.14.1 fire-auth/1.7.9 fire-auth-esm2017/1.7.9",
-              dates: [new Date().toISOString().split("T")[0]],
-            },
-          ],
-        }),
-        "X-Firebase-gmpid": creds.appId.slice(2),
-      },
-      body: JSON.stringify({
-        returnSecureToken: true,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(
-        `Auth request failed: ${response.status} ${response.statusText}`
-      );
-    }
-
-    return (await response.json()) as { idToken: string };
-  }
-
-  /**
-   * Retrieves the transcript of a particular video.
-   * @param {string} id - The YouTube video ID
-   * @param {object} [config] - Request configurations for additional headers
-   * @returns A Promise that resolves to the transcript object
-   */
-  async getTranscript(
-    id: string,
-    config?: { headers?: Record<string, string> }
-  ): Promise<any> {
-    const auth = await this.#get_auth();
-
-    try {
-      const response = await this.#fetch("/api/transcripts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(config?.headers || {}),
-          Authorization: "Bearer " + auth.idToken,
-          "X-Hash": generateRandomHex(64),
-        },
-        body: JSON.stringify({
-          ids: [id],
-        }),
-      });
-
-      if (!response.ok) {
-        if (response.status === 403) {
-          throw new Error("invalid video ID");
-        }
-        throw new Error(
-          `Request failed: ${response.status} ${response.statusText}`
-        );
-      }
-
-      const data = await response.json();
-      return data[0];
-    } catch (e) {
-      if (e instanceof Error) {
-        throw e;
-      }
-      throw new Error("An unknown error occurred");
-    }
-  }
-
-  /**
-   * Retrieves the transcript of multiple videos.
-   * @param {string[]} ids - A list of YouTube video IDs
-   * @param {object} [config] - Request configurations for additional headers
-   * @returns A Promise that resolves to an array of transcript objects
-   */
-  async bulkGetTranscript(
-    ids: string[],
-    config?: { headers?: Record<string, string> }
-  ): Promise<any[]> {
-    const auth = await this.#get_auth();
-
-    try {
-      const response = await this.#fetch("/api/transcripts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(config?.headers || {}),
-          Authorization: "Bearer " + auth.idToken,
-          "X-Hash": generateRandomHex(64),
-        },
-        body: JSON.stringify({
-          ids,
-        }),
-      });
-
-      if (!response.ok) {
-        if (response.status === 403) {
-          throw new Error("video not found or unavailable");
-        }
-        throw new Error(
-          `Request failed: ${response.status} ${response.statusText}`
-        );
-      }
-
-      return await response.json();
-    } catch (e) {
-      if (e instanceof Error) {
-        throw e;
-      }
-      throw new Error("An unknown error occurred");
-    }
-  }
-}
-
-/// PLUGIN
-
-function youtubeUrlToId(url: string): string {
-  const regExp =
-    /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-  const match = url.match(regExp);
-  return match && match[7].length == 11 ? match[7] : "";
-}
+/// PLUGIN /////////////////////////////////////////////////////////////////////
 
 const url = mmry.input("youtube-video")?.value;
 if (!url) {
@@ -253,30 +12,34 @@ if (!url) {
   Deno.exit(0);
 }
 
-const id = youtubeUrlToId(url);
-if (!id) {
-  mmry.status("URL invalid");
-  Deno.exit(0);
+try {
+  mmry.status("Fetching video information...");
+
+  const videoId = f1(url);
+  const data = await f3(videoId);
+  const details = data.videoDetails;
+  const transcript = await f6(data);
+  const thumbnail = details.thumbnail.thumbnails[0].url;
+
+  if (!transcript) {
+    mmry.status("No transcript available for this video");
+    Deno.exit(0);
+  }
+
+  mmry.add({
+    externalId: videoId,
+    title: details.title,
+    description: details.shortDescription,
+    content: transcript,
+    author: details.author,
+    channelId: details.channelId,
+    viewCount: details.viewCount,
+    thumbnail,
+    urls: [thumbnail],
+  });
+
+  mmry.status("Transcript added successfully");
+} catch (error: any) {
+  mmry.status(`Failed to get transcript: ${error.message}`);
+  Deno.exit(1);
 }
-
-const client = new TranscriptClient();
-await client.ready;
-const transcript = await client.getTranscript(id);
-
-transcript.tracks.sort((a: any, b: any) => {
-  if (a.language === "en") return -1;
-  if (b.language === "en") return 1;
-  return a.language.localeCompare(b.language);
-});
-
-const text = transcript.tracks[0].transcript
-  .map((t: any) => t.text)
-  .join(" ")
-  .replace(/ +/g, " ");
-
-mmry.add({
-  content: text,
-  externalId: id,
-  urls: [url],
-  collection: "youtube",
-});

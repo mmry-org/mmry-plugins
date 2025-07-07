@@ -20,9 +20,7 @@
       "create-item"
     ],
     "allow-net": [
-      "youtube.com",
-      "www.youtube.com",
-      "youtubei.googleapis.com"
+      "www.youtube.com"
     ],
     "defaultCollection": {
       "id": "youtube",

@@ -1,10 +1,11 @@
 {
   "name": "@mmry-org/sdk",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "",
   "license": "MIT",
   "author": "janniks",
-  "main": "index.ts",
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.mts",
   "scripts": {
     "build": "tsup index.ts --format esm --dts --out-dir dist",
     "prepublishOnly": "npm run build"

@@ -13,7 +13,7 @@
     "description": "Transcribe YouTube videos",
     "store": {
       "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXlvdXR1YmUtaWNvbiBsdWNpZGUteW91dHViZSI+PHBhdGggZD0iTTIuNSAxN2EyNC4xMiAyNC4xMiAwIDAgMSAwLTEwIDIgMiAwIDAgMSAxLjQtMS40IDQ5LjU2IDQ5LjU2IDAgMCAxIDE2LjIgMEEyIDIgMCAwIDEgMjEuNSA3YTI0LjEyIDI0LjEyIDAgMCAxIDAgMTAgMiAyIDAgMCAxLTEuNCAxLjQgNDkuNTUgNDkuNTUgMCAwIDEtMTYuMiAwQTIgMiAwIDAgMSAyLjUgMTciLz48cGF0aCBkPSJtMTAgMTUgNS0zLTUtM3oiLz48L3N2Zz4=",
-      "bg": "#ff0000",
+      "bg": "#dd0000",
       "tagline": "Transcribe YouTube videos"
     },
     "permissions": [
@@ -25,7 +25,7 @@
     "defaultCollection": {
       "id": "youtube",
       "name": "YouTube",
-      "color": "#ff0000"
+      "color": "#dd0000"
     },
     "type": "trigger",
     "inputs": [

@@ -20,7 +20,7 @@
       "create-item"
     ],
     "defaultCollection": {
-      "name": "Raindrop",
+      "name": "raindrop",
       "color": "#4086D9"
     },
     "defaultCron": "0 0 * * *",

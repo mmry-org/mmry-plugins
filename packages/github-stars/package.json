@@ -23,8 +23,7 @@
       "api.github.com"
     ],
     "defaultCollection": {
-      "id": "github:repository",
-      "name": "GitHub Repositories",
+      "name": "github:repository",
       "color": "#f59e0b"
     },
     "defaultCron": "0 0 * * *",

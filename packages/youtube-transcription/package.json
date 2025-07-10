@@ -23,8 +23,7 @@
       "www.youtube.com"
     ],
     "defaultCollection": {
-      "id": "youtube",
-      "name": "YouTube",
+      "name": "youtube",
       "color": "#dd0000"
     },
     "type": "trigger",

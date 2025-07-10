@@ -20,8 +20,7 @@
       "create-item"
     ],
     "defaultCollection": {
-      "id": "twitter",
-      "name": "Twitter",
+      "name": "twitter",
       "color": "#1DA1F2"
     },
     "type": "trigger",

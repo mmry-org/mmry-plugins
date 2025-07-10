@@ -61,7 +61,7 @@ while (hasMorePages) {
     const ownerLogin = repo?.owner?.login || "Unknown";
     const repoHtmlUrl = repo?.html_url || "";
     const content = [
-      `Title: ${repo?.name || "Unknown"}`,
+      `${repo?.name || "Unknown"}`,
       `Description: ${repo?.description || "No description"}`,
       `Language: ${repo?.language || "Not specified"}`,
       `Stars: ${repo?.stargazers_count || 0}`,

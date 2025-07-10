@@ -15,6 +15,8 @@ export type MmryItem = {
   externalId?: string;
   /** The textual content of the item */
   content: string;
+  /** The href of the item */
+  href?: string;
   /** The date the item was created */
   createdAt?: number | string | Date;
   /** The date the item was updated */
@@ -89,9 +91,7 @@ export const mmry = {
     if (id) return process.env[id];
 
     return Object.fromEntries(
-      Object.entries(process.env).filter(
-        ([key]) => !key.startsWith("_")
-      )
+      Object.entries(process.env).filter(([key]) => !key.startsWith("_"))
     );
   },
   input(id: string) {
@@ -122,7 +122,7 @@ export const mmry = {
     for (const entry of entries) {
       if (!entry.isFile() || !entry.name.endsWith(".json")) continue;
       const filePath = path.join(IN_DIR, entry.name);
-      const content = fs.readFileSync(filePath, 'utf8');
+      const content = fs.readFileSync(filePath, "utf8");
       yield JSON.parse(content) as MmryItem & { id: string };
     }
   },

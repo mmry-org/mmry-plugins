@@ -26,8 +26,6 @@ mmry.status("Fetching repositories...");
 let currentPage = 1;
 let hasMorePages = true;
 let newStarsCount = 0;
-let processedForDebugCount = 0;
-const DEBUG_ITEM_LIMIT = 10;
 
 while (hasMorePages) {
   console.log(`Fetching page ${currentPage}...`);
@@ -56,9 +54,7 @@ while (hasMorePages) {
       break;
     }
 
-    console.log(
-      `Processing new star #${processedForDebugCount} (${repo.full_name})`
-    );
+    console.log(`Processing new star: ${repo.full_name}`);
 
     // Access repository data from the nested repo property
     const topics = repo?.topics || [];
@@ -94,6 +90,7 @@ while (hasMorePages) {
     const itemToAdd = {
       content,
       externalId: repo?.id.toString(),
+      href: repo.html_url,
       createdAt: star.starred_at || new Date().toISOString(),
       updatedAt: repo?.updated_at || new Date().toISOString(),
       urls,
@@ -107,7 +104,6 @@ while (hasMorePages) {
       fullName: repo?.full_name || "Unknown",
     };
 
-    console.log("Adding item to mmry:", JSON.stringify(itemToAdd, null, 2));
     mmry.add(itemToAdd);
 
     // Update state after each star to enable resuming
@@ -118,16 +114,6 @@ while (hasMorePages) {
     }
 
     newStarsCount++;
-    processedForDebugCount++;
-
-    // Hard stop for debugging
-    if (processedForDebugCount >= DEBUG_ITEM_LIMIT) {
-      console.log(
-        `\n--- DEBUG: Hit item limit of ${DEBUG_ITEM_LIMIT}. Stopping sync. ---\n`
-      );
-      hasMorePages = false;
-      break;
-    }
   }
 
   // If we got fewer results than the page size, we've reached the end
@@ -160,13 +146,13 @@ async function fetchStarredRepos(
 
     if (!response.ok) {
       if (response.status === 401) {
-        mmry.status("Invalid GitHub token - check your permissions");
+        mmry.status("Invalid GitHub token");
         console.error("Authentication failed - invalid token");
       } else if (response.status === 403) {
-        mmry.status("Rate limit exceeded - try again later");
+        mmry.status("Rate limit exceeded");
         console.error("GitHub API rate limit exceeded");
       } else {
-        mmry.status(`GitHub API error: ${response.status}`);
+        mmry.status(`GitHub API error`);
         console.error(
           `GitHub API error: ${response.status} ${response.statusText}`
         );

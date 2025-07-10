@@ -23,8 +23,8 @@
       "api.github.com"
     ],
     "defaultCollection": {
-      "id": "github:repository:star",
-      "name": "GitHub Stars",
+      "id": "github:repository",
+      "name": "GitHub Repositories",
       "color": "#f59e0b"
     },
     "defaultCron": "0 0 * * *",

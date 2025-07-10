@@ -1,4 +1,4 @@
-import { mmry } from "npm:@mmry-org/sdk@0.0.5";
+import { mmry } from "npm:@mmry-org/sdk";
 
 const GITHUB_API_URL = "https://api.github.com";
 const PER_PAGE = 100; // Maximum allowed by GitHub API

@@ -59,6 +59,7 @@ while (hasMorePages) {
     // Access repository data from the nested repo property
     const topics = repo?.topics || [];
     const ownerLogin = repo?.owner?.login || "Unknown";
+    const repoHtmlUrl = repo?.html_url || "";
     const content = [
       `Title: ${repo?.name || "Unknown"}`,
       `Description: ${repo?.description || "No description"}`,
@@ -73,12 +74,12 @@ while (hasMorePages) {
 
     // Build URLs array
     const urls: string[] = [];
-    if (repo?.html_url) {
-      urls.push(repo.html_url);
+    if (repoHtmlUrl) {
+      urls.push(repoHtmlUrl);
 
       // Add README URL if available (most repos have README in root)
       urls.push(
-        `${repo.html_url}/blob/${repo.default_branch || "main"}/README.md`
+        `${repoHtmlUrl}/blob/${repo.default_branch || "main"}/README.md`
       );
     }
 
@@ -89,10 +90,11 @@ while (hasMorePages) {
 
     const itemToAdd = {
       content,
-      externalId: repo?.id.toString(),
-      href: repo.html_url,
-      createdAt: repo.created_at || new Date().toISOString(),
-      updatedAt: star.starred_at || new Date().toISOString(),
+      externalId: repo?.id.toString() || "unknown",
+      href: repoHtmlUrl || null,
+      createdAt: repo?.created_at || new Date().toISOString(),
+      updatedAt:
+        star.starred_at || repo?.created_at || new Date().toISOString(),
       urls,
       // Additional metadata
       language: repo?.language || null,
@@ -139,7 +141,7 @@ async function fetchStarredRepos(
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
-        Accept: "application/vnd.github.star+json",
+        Accept: "application/vnd.github.v3.star+json",
         "X-GitHub-Api-Version": "2022-11-28",
       },
     });

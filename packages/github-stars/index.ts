@@ -91,8 +91,8 @@ while (hasMorePages) {
       content,
       externalId: repo?.id.toString(),
       href: repo.html_url,
-      createdAt: star.starred_at || new Date().toISOString(),
-      updatedAt: repo?.updated_at || new Date().toISOString(),
+      createdAt: repo.created_at || new Date().toISOString(),
+      updatedAt: star.starred_at || new Date().toISOString(),
       urls,
       // Additional metadata
       language: repo?.language || null,

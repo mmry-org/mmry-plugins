@@ -116,7 +116,7 @@ for (const collection of collections) {
         )}`,
         createdAt: bookmark.created,
         updatedAt: bookmark.lastUpdate,
-        url: bookmark.link,
+        href: bookmark.link,
       });
       state.collections[cid].lastSyncedTimestamp = bookmark.created;
       state.collections[cid].lastSyncedPage = page;

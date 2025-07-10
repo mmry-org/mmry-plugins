@@ -23,7 +23,7 @@ const likes = JSON.parse(
 
 const items = likes.map((l: any) => ({
   externalId: l.like.tweetId,
-  url: `https://twitter.com/username/status/${l.like.tweetId}`,
+  href: `https://twitter.com/username/status/${l.like.tweetId}`,
   content: l.like.fullText,
   username: l.like.username,
   collection: "twitter:likes", // todo: make syntax work

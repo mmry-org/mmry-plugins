@@ -1,16 +1,18 @@
 import { mmry } from "npm:@mmry-org/sdk";
 
-console.log("Hello, world! Twitter plugin index.ts");
-
-console.log("mmry inputs");
-console.log(mmry.inputs());
-console.log(mmry.input("twitter-data-export"));
-
 const file = mmry.inputFile("twitter-data-export");
-if (!file) Deno.exit(1); // todo: error messages to UI
+if (!file) {
+  mmry.status("Twitter data export files not found");
+  Deno.exit(1);
+}
 
 if (file.stat.isDirectory) console.log("isDirectory");
 if (file.stat.isFile) console.log("isFile");
+
+if (!file.stat.isDirectory) {
+  mmry.status("Expected a directory, got a file");
+  Deno.exit(1);
+}
 
 const likes = JSON.parse(
   Deno.readTextFileSync(`${file.path}/data/like.js`).replace(
@@ -21,13 +23,13 @@ const likes = JSON.parse(
 
 const items = likes.map((l: any) => ({
   externalId: l.like.tweetId,
+  url: `https://twitter.com/username/status/${l.like.tweetId}`,
   content: l.like.fullText,
   username: l.like.username,
   collection: "twitter:likes", // todo: make syntax work
   createdAt: getTweetDate(l.like.tweetId),
 }));
 
-// mmry.addMany(items.slice(0, 10));
 mmry.addMany(items);
 
 // HELPERS

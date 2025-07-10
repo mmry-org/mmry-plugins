@@ -8,7 +8,7 @@ console.log("Starting twitter tweet scrape plugin...");
 let count = 0;
 for (const item of mmry.items()) {
   try {
-    if (item?.collection !== "twitter:likes") continue; // wrong item type
+    if (item?.collection !== "twitter:like") continue; // wrong item type
     if (!item?.externalId) continue; // invalid
     if (item?.username) continue; // already scraped
 

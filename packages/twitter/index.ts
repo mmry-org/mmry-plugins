@@ -26,7 +26,7 @@ const items = likes.map((l: any) => ({
   href: `https://twitter.com/username/status/${l.like.tweetId}`,
   content: l.like.fullText,
   username: l.like.username,
-  collection: "twitter:likes", // todo: make syntax work
+  collection: "twitter:like",
   createdAt: getTweetDate(l.like.tweetId),
 }));
 

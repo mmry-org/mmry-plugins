@@ -122,8 +122,7 @@ The `mmry` field defines plugin metadata:
     "filter": "collection-name", // For enhance plugins
     "allow-net": ["domain1.com", "domain2.com"], // Network permissions
     "defaultCollection": { // Optional: Default collection for items
-      "id": "collection-id",
-      "name": "Collection Name",
+      "name": "collection-name",
       "color": "#hex-color"
     },
     "inputs": [

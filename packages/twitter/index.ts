@@ -28,6 +28,12 @@ const items = likes.map((l: any) => ({
   username: l.like.username,
   collection: "twitter:like",
   createdAt: getTweetDate(l.like.tweetId),
+  urls: l.like.fullText
+    .split(/\s+/)
+    .filter(
+      (word: string) =>
+        word.startsWith("http://") || word.startsWith("https://")
+    ),
 }));
 
 mmry.addMany(items);

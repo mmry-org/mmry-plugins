@@ -6,9 +6,6 @@ if (!file) {
   Deno.exit(1);
 }
 
-if (file.stat.isDirectory) console.log("isDirectory");
-if (file.stat.isFile) console.log("isFile");
-
 if (!file.stat.isDirectory) {
   mmry.status("Expected a directory, got a file");
   Deno.exit(1);
@@ -28,7 +25,7 @@ const items = likes.map((l: any) => ({
   username: l.like.username,
   collection: "twitter:like",
   createdAt: getTweetDate(l.like.tweetId),
-  urls: l.like.fullText
+  urls: String(l.like.fullText || "")
     .split(/\s+/)
     .filter(
       (word: string) =>
